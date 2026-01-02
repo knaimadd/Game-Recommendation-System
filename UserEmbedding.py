@@ -12,6 +12,12 @@ def get_game_vector(appid, appid_to_index):
         return None
     return X_tfidf[idx]
 
+def get_names(appids, name_index_json):
+    with open(name_index_json, "r") as f:
+        name_index = json.load(f)
+        output_names = [name_index.get(appid, f"Game name not in database: {appid}") for appid in appids]
+        return output_names 
+
 
 class UserEmbedding:
 
@@ -26,7 +32,7 @@ class UserEmbedding:
     def resolve_vanity_url(self, parsed_vanity_url):
         username = parsed_vanity_url[-1]
         try:
-            user = steam.users.search_user(username)
+            user = self.steam.users.search_user(username)
             return user["player"]["steamid"]
         except Exception as e:
             raise Exception(f"Error fetching user steamid: {e}")
@@ -51,7 +57,7 @@ class UserEmbedding:
     
     def get_username(self):
         try:
-            user = steam.users.get_user_details(self.steamid)
+            user = self.steam.users.get_user_details(self.steamid)
             return user["player"]["personaname"]
         except Exception as e:
             print(f"Error fetching username: {e}")
@@ -59,7 +65,7 @@ class UserEmbedding:
     
     def get_user_games(self):
         try:
-            user_games = steam.users.get_owned_games(self.steamid)
+            user_games = self.steam.users.get_owned_games(self.steamid)
             if user_games.get("total_count") == 0:
                 print("No games found on the user profile. Stopping.")
                 exit(0)
@@ -70,7 +76,7 @@ class UserEmbedding:
 
     def get_user_recent_games(self):
         try:
-            recent_games = steam.users.get_user_recently_played_games(self.steamid)
+            recent_games = self.steam.users.get_user_recently_played_games(self.steamid)
             if recent_games.get("total_count") == 0:
                 print("No recent games found")
                 return []
@@ -146,22 +152,22 @@ class UserEmbedding:
         best_idxs = best_idxs[np.argsort(-best_scores)]
         best_scores = scores[best_idxs]
 
-        recommendations = []
-        for i, score in zip(best_idxs, best_scores):
-            if len(recommendations) >= n_games:
+        recommendations_appid = []
+        for i in best_idxs:
+            if len(recommendations_appid) >= n_games:
                 break
             appid = index_to_appid[str(i)]
-            if appid in owned_appids:
+            if int(appid) in owned_appids:
                 continue
-            recommendations.append((index_to_appid[str(i)], score))
+            recommendations_appid.append(index_to_appid[str(i)])
         
-        return recommendations
+        recommendations_names = get_names(recommendations_appid, "data/name_index.json")
+        return list(zip(recommendations_names, best_scores))
         
 
 if __name__ == "__main__":
     KEY = "XXX"
-    steam = Steam(KEY)
 
-    user = UserEmbedding("https://steamcommunity.com/profiles/76561199825590026/")
+    user = UserEmbedding("https://steamcommunity.com/profiles/76561198135163136", KEY)
     user.build_user_vector()
     print(user.recommend_games(10))

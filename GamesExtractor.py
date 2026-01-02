@@ -84,3 +84,12 @@ def add_fields_ndjson(input_file: str, output_file: str, tags_lookup: dict, genr
             # write back with the same appid as key
             json.dump({appid: data}, fout, ensure_ascii=False)
             fout.write("\n")
+
+def build_name_index(input_ndjson: str, output_json: str) -> dict:
+    name_index = {}
+
+    for game in iter_games_ndjson(input_ndjson):
+        name_index[game[0]] = game[1].get("name")
+
+    with open(output_json, "w") as f:
+        json.dump(name_index, f)
