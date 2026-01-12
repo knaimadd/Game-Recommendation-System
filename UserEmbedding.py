@@ -6,6 +6,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 X_tfidf = load_npz("data/game_vectors.npz")
 
+N_GAMES = 81650
+
 def get_game_vector(appid, appid_to_index):
     idx = appid_to_index.get(str(appid))
     if idx is None:
@@ -163,11 +165,44 @@ class UserEmbedding:
         
         recommendations_names = get_names(recommendations_appid, "data/name_index.json")
         return list(zip(recommendations_names, best_scores))
+    
+    def random_not_played_games(self, n_games, power=0.75):
+        if self.user_vector is None:
+            owned_appids = []
+        else:
+            owned_appids = [game.get("appid") for game in self.user_games]
+        
+        # weights = np.exp(-power*np.arange(N_GAMES))
+        weights = 1/np.power(np.arange(N_GAMES) + 1, power)
+        weights = weights/np.sum(weights)
+        random_inds = sorted(np.random.choice(np.arange(N_GAMES), p=weights, size=n_games))
+        random_inds = np.sort(random_inds)
+        
+        random_games = []
+        with open("data/steam_games_detailed.ndjson", "r", encoding="utf-8") as f:
+            c = 0
+            for i, line in enumerate(f):
+                if i >= random_inds[c]:
+                    game = list(json.loads(line).items())[0]
+                    gameid = game[0]
+                    if gameid in owned_appids:
+                        continue
+                    game_name = game[1].get("name")
+                    random_games.append((gameid, game_name))
+                    c += 1
+                    if c >= n_games:
+                        break
+        
+        np.random.shuffle(random_games)
+        return random_games
+
+        
         
 
 if __name__ == "__main__":
-    KEY = "XXX"
+    KEY = "110B8B0590263C8C00B6120E6EE1326D"
 
     user = UserEmbedding("https://steamcommunity.com/profiles/76561198135163136", KEY)
     user.build_user_vector()
-    print(user.recommend_games(10))
+    print("Personalized games: ", user.recommend_games(10))
+    print("Random popular (kind of) games: ", user.random_not_played_games(10))
