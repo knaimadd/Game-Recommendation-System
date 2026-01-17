@@ -164,7 +164,7 @@ class UserEmbedding:
             recommendations_appid.append(index_to_appid[str(i)])
         
         recommendations_names = get_names(recommendations_appid, "data/name_index.json")
-        return list(zip(recommendations_names, best_scores))
+        return list(zip(recommendations_names, best_scores, recommendations_appid))
     
     def random_not_played_games(self, n_games, power=0.75):
         if self.user_vector is None:
@@ -195,14 +195,27 @@ class UserEmbedding:
         
         np.random.shuffle(random_games)
         return random_games
+    
+def get_app_url(appid):
+    return f"https://store.steampowered.com/app/{appid}"
 
         
         
 
 if __name__ == "__main__":
-    KEY = "110B8B0590263C8C00B6120E6EE1326D"
+    KEY = "XXX"
 
-    user = UserEmbedding("https://steamcommunity.com/profiles/76561198135163136", KEY)
+    user = UserEmbedding("https://steamcommunity.com/profiles/76561198291250923/", KEY)
     user.build_user_vector()
-    print("Personalized games: ", user.recommend_games(10))
-    print("Random popular (kind of) games: ", user.random_not_played_games(10))
+    recommended_games = user.recommend_games(10)
+    random_games = user.random_not_played_games(10)
+    print("Personalized games: ")
+    for i in range(10):
+        print(f"{i+1}. {recommended_games[i][0]} ({recommended_games[i][1]}) - {get_app_url(recommended_games[i][2])}")
+    print("\n")
+    for i in range(10):
+        print(f"{i+1}. {recommended_games[i][0]} - {get_app_url(recommended_games[i][2])}")
+    print("\nRandom popular (kind of) games: ")
+    for i in range(10):
+        print(f"{i+1}. {random_games[i][1]} - {get_app_url(random_games[i][0])}")
+    
