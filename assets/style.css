@@ -1,0 +1,187 @@
+/* ================== Title ================== */
+
+.h1-title-text {
+    font-family: 'Impact', 'Charcoal', sans-serif, cursive;
+    font-weight: 900;
+    font-size: 3rem;
+    background: linear-gradient(45deg, #23507e, #66c0f4, #70c4f5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    margin-bottom: 4rem;
+}
+
+.h1-title-text::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(270deg, #66c0f4, rgb(121, 151, 181), #52c0ff);
+    background-size: 400% 100%;
+    border-radius: 2px;
+    animation: glowLine 2s linear infinite;
+}
+
+@keyframes glowLine {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.steam-input:-webkit-autofill,
+.steam-input:-webkit-autofill:hover,
+.steam-input:-webkit-autofill:focus,
+.steam-input:-webkit-autofill:active {
+    -webkit-text-fill-color: #c7d5e0 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #1b2838 inset !important;
+    box-shadow: 0 0 0px 1000px #1b2838 inset !important;
+}
+
+.steam-input,
+.steam-dropdown .Select-control,
+#submit-btn {
+    height: 40px;       /* or whatever height you prefer */
+    min-height: 40px;   /* ensures react-select respects it */
+    line-height: 1.2;   /* keeps text vertically centered */
+    padding: 0 12px;    /* optional horizontal padding */
+}
+
+.alert-warning {
+    background-color: #66c0f4 !important;
+    color: #0b1b2b !important;  /* dark text for contrast */
+    border-color: #66c0f4 !important;
+}
+
+/* ================== Game Card Styles ================== */
+
+.game-cover-container {
+    width: 100%;
+    height: 360px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.game-cover-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.card {
+    background-color: #1b2838 !important;
+    border-radius: 12px;
+    border: none;
+    color: #c7d5e0;
+}
+
+.btn-primary {
+    background-color: #66c0f4;
+    border: none;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #1b74d4;
+}
+
+.game-cover-container {
+    position: relative;
+}
+
+.game-rank {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background-color: rgba(102, 192, 244, 0.85);
+    color: #0b1b2b;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    z-index: 2;
+}
+
+
+/* ================== Body & Headers ================== */
+body {
+    background-color: #0b1b2b;
+    color: #c7d5e0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1, h3, h6 {
+    color: #c7d5e0;
+}
+
+/* ================== Steam Search & Dropdown ================== */
+.steam-input {
+    background-color: #1b2838;
+    color: #c7d5e0;
+    border: 1px solid #4b6eaf;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.steam-input::placeholder {
+    color: #8696a7;
+}
+
+.steam-input:focus {
+    border-color: #66c0f4;
+    box-shadow: 0 0 5px #66c0f4;
+    outline: none;
+}
+
+.steam-dropdown .Select-control {
+    background-color: #1b2838 !important;
+    border: 1px solid #4b6eaf !important;
+    border-radius: 4px;
+}
+
+.steam-dropdown .Select-placeholder {
+    color: #8696a7 !important;
+}
+
+.steam-dropdown .Select-value-label {
+    color: #c7d5e0 !important;
+}
+
+.steam-dropdown .Select-arrow-zone {
+    color: #c7d5e0 !important;
+}
+
+.steam-dropdown .Select-menu-outer {
+    background-color: #1b2838 !important;
+    color: #c7d5e0;
+    text-align: right;
+}
+
+.steam-dropdown .Select-option.is-focused {
+    background-color: #66c0f4 !important;
+    color: #000 !important;
+}
+
+.steam-dropdown .Select-option.is-selected {
+    background-color: #66c0f4 !important;
+    color: #000 !important;
+}
+
+.steam-dropdown .Select-placeholder,
+.steam-dropdown .Select-value-label {
+    line-height: 40px;
+}
+
+.page-container {
+    padding: 100rem;   /* or margin: 2rem; */
+}
