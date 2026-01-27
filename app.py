@@ -20,33 +20,18 @@ app.layout = dbc.Container([
 
     dbc.Row([
         dbc.Col(
-            dcc.Dropdown(
-                id="profile-type",
-                options=[
-                    
-                    {"label": "id/", "value": "id"},
-                    {"label": "profiles/", "value": "profiles"}
-                ],
-                value="id",
-                clearable=False,
-                className="steam-dropdown",
-                style={"width": "100%"}
-            ),
-            width=2
-        ),
-        dbc.Col(
             dcc.Input(
-                id="profile-value",
+                id="profile-url",
                 type="text",
-                placeholder="Enter Steam ID or username",
+                placeholder="Enter full Steam profile URL (e.g. https://steamcommunity.com/id/username/)",
                 style={"width": "100%"},
                 className="steam-input"
             ),
-            width=7
+            width=9
         ),
         dbc.Col(
             dbc.Button(
-                "Recommendations ⯈",
+                "Get Recommendations",
                 id="submit-btn",
                 color="primary",
                 className="w-100"
@@ -78,16 +63,19 @@ def get_image_url(appid):
 @app.callback(
     Output("results", "children"),
     Input("submit-btn", "n_clicks"),
-    State("profile-type", "value"),
-    State("profile-value", "value"),
+        State("profile-url", "value"),
     prevent_initial_call=True
 )
 
-def generate_recommendations(n_clicks, profile_type, profile_value):
-    if not profile_value:
-        return dbc.Alert("Please enter a valid Steam profile identifier.", color="warning")
+def generate_recommendations(n_clicks, profile_url):
+    if not profile_url:
+        return dbc.Alert("Please enter a valid Steam profile URL.", color="warning")
 
-    profile_url = f"https://steamcommunity.com/{profile_type}/{profile_value}/"
+    profile_url = profile_url.strip()
+    if not (profile_url.startswith("http://") or profile_url.startswith("https://")):
+        return dbc.Alert("Please enter a full URL starting with http:// or https://", color="warning")
+    if not profile_url.endswith("/"):
+        profile_url += "/"
 
     try:
         user = UserEmbedding(profile_url, STEAM_API_KEY)
