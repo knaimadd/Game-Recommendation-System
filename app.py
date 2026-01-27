@@ -27,7 +27,17 @@ app.layout = dbc.Container([
                 style={"width": "100%"},
                 className="steam-input"
             ),
-            width=9
+            width=7
+        ),
+        dbc.Col(
+            dcc.Input(
+                id="n-games",
+                type="int",
+                placeholder="Number of games e.g. 10",
+                style={"width": "100%"},
+                className="steam-input"
+            ),
+            width=2
         ),
         dbc.Col(
             dbc.Button(
@@ -63,11 +73,12 @@ def get_image_url(appid):
 @app.callback(
     Output("results", "children"),
     Input("submit-btn", "n_clicks"),
-        State("profile-url", "value"),
+    State("profile-url", "value"),
+    State("n-games", "value"),
     prevent_initial_call=True
 )
 
-def generate_recommendations(n_clicks, profile_url):
+def generate_recommendations(n_clicks, profile_url, n_games):
     if not profile_url:
         return dbc.Alert("Please enter a valid Steam profile URL.", color="warning")
 
@@ -78,9 +89,16 @@ def generate_recommendations(n_clicks, profile_url):
         profile_url += "/"
 
     try:
+        n_games = int(n_games) if n_games else 10
+        if n_games <= 0:
+            n_games = 10
+    except Exception:
+        n_games = 10
+
+    try:
         user = UserEmbedding(profile_url, STEAM_API_KEY)
         user.build_user_vector()
-        recs = user.recommend_games(10)
+        recs = user.recommend_games(n_games)
 
         if not recs:
             return dbc.Alert("No recommendations could be generated.", color="warning")
@@ -128,7 +146,7 @@ def generate_recommendations(n_clicks, profile_url):
 
     return html.Div([
         html.H3(f"Recommendations for {user.username}", className="mb-3"),
-        dbc.Row(cards, className="g-4")
+        dbc.Row(cards, className="g-4", justify="center")
     ])
 
 
