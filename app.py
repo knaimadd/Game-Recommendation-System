@@ -73,12 +73,14 @@ def get_image_url(appid):
 @app.callback(
     Output("results", "children"),
     Input("submit-btn", "n_clicks"),
+    Input("profile-url", "n_submit"),
+    Input("n-games", "n_submit"),
     State("profile-url", "value"),
     State("n-games", "value"),
     prevent_initial_call=True
 )
 
-def generate_recommendations(n_clicks, profile_url, n_games):
+def generate_recommendations(n_clicks, profile_url_enter, n_games_enter, profile_url, n_games):
     if not profile_url:
         return dbc.Alert("Please enter a valid Steam profile URL.", color="warning")
 
