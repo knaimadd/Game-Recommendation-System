@@ -23,7 +23,7 @@ app.layout = dbc.Container([
             dcc.Input(
                 id="profile-url",
                 type="text",
-                placeholder="Enter full Steam profile URL (e.g. https://steamcommunity.com/id/username/)",
+                placeholder="Enter full Steam profile URL (e.g. https://steamcommunity.com/id/username/ or https://steamcommunity.com/profiles/steamID/)",
                 style={"width": "100%"},
                 className="steam-input"
             ),
