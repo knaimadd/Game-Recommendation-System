@@ -94,13 +94,13 @@ def get_image_url(appid):
 
 def generate_recommendations(n_clicks, profile_url_enter, n_games_enter, profile_url, n_games, steam_api_key):
     if not profile_url:
-        return dbc.Alert("Please enter a valid Steam profile URL.", color="warning")
+        return dbc.Alert("Please enter a valid Steam profile URL.", color="danger")
 
     profile_url = profile_url.strip()
-    if not (profile_url.startswith("http://") or profile_url.startswith("https://")):
-        return dbc.Alert("Please enter a full URL starting with http:// or https://", color="warning")
-    if not profile_url.endswith("/"):
-        profile_url += "/"
+    # if not (profile_url.startswith("http://") or profile_url.startswith("https://")):
+    #     return dbc.Alert("Please enter a full URL starting with http:// or https://", color="danger")
+    # if not profile_url.endswith("/"):
+    #     profile_url += "/"
 
     try:
         n_games = int(n_games) if n_games else 10
@@ -133,7 +133,7 @@ def generate_recommendations(n_clicks, profile_url_enter, n_games_enter, profile
                 recs = user.recommend_games(n_games)
                 if not recs:
                     raise Exception("Exception")
-                notice = dbc.Alert("Provided Steam Web API key appears invalid; succesfully used default key instead.", color="warning")
+                notice = dbc.Alert("Provided Steam Web API key appears invalid; succesfully used default key instead.", color="info")
             except Exception as e_default:
                 return dbc.Alert("Could not generate recommendations (provided key invalid and default key failed).", color="danger")
     else:
@@ -146,7 +146,7 @@ def generate_recommendations(n_clicks, profile_url_enter, n_games_enter, profile
             return dbc.Alert(str(e), color="danger")
 
     if not recs:
-        return dbc.Alert("No recommendations could be generated.", color="warning")
+        return dbc.Alert("Recommendations could not be generated.", color="danger")
 
     cards = []
     for idx, (name, score, appid) in enumerate(recs):
@@ -186,7 +186,7 @@ def generate_recommendations(n_clicks, profile_url_enter, n_games_enter, profile
         )
 
 
-    return html.Div([
+    return notice, html.Div([
         html.H3(f"Recommendations for {user.username}", className="mb-3"),
         dbc.Row(cards, className="g-4", justify="center")
     ])

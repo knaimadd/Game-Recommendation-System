@@ -54,6 +54,12 @@
 }
 
 .alert-warning {
+    background-color: #eaac66 !important;
+    color: #0b1b2b !important;  /* dark text for contrast */
+    border-color: #66c0f4 !important;
+}
+
+.alert-info {
     background-color: #66c0f4 !important;
     color: #0b1b2b !important;  /* dark text for contrast */
     border-color: #66c0f4 !important;
