@@ -47,7 +47,18 @@ app.layout = dbc.Container([
                 className="w-100"
             ),
             width=3
-        )
+        ),
+        dbc.Col(
+            dcc.Input(
+                id="Steam-api-key",
+                type="text",
+                placeholder="Optional Steam Web API key (if you or your friends don't have public profiles)",
+                style={"width": "100%"},
+                className="steam-input"
+            ),
+            width=4
+        ),
+
     ], className="mb-4 g-2"),
 
     dcc.Loading(
@@ -77,10 +88,11 @@ def get_image_url(appid):
     Input("n-games", "n_submit"),
     State("profile-url", "value"),
     State("n-games", "value"),
+    State("Steam-api-key", "value"),
     prevent_initial_call=True
 )
 
-def generate_recommendations(n_clicks, profile_url_enter, n_games_enter, profile_url, n_games):
+def generate_recommendations(n_clicks, profile_url_enter, n_games_enter, profile_url, n_games, steam_api_key):
     if not profile_url:
         return dbc.Alert("Please enter a valid Steam profile URL.", color="warning")
 
@@ -97,16 +109,44 @@ def generate_recommendations(n_clicks, profile_url_enter, n_games_enter, profile
     except Exception:
         n_games = 10
 
+    # prefer API key provided in the form when present, otherwise use file constant
+    provided_key = None
     try:
-        user = UserEmbedding(profile_url, STEAM_API_KEY)
-        user.build_user_vector()
-        recs = user.recommend_games(n_games)
+        provided_key = steam_api_key.strip() if steam_api_key else None
+    except Exception:
+        provided_key = None
 
-        if not recs:
-            return dbc.Alert("No recommendations could be generated.", color="warning")
+    notice = None
+    # try provided key first (if it differs from default), otherwise use default directly
+    if provided_key and provided_key != STEAM_API_KEY:
+        try:
+            user = UserEmbedding(profile_url, provided_key)
+            user.build_user_vector()
+            recs = user.recommend_games(n_games)
+            if not recs:
+                raise Exception("Exception")
+        except Exception as e_provided:
+            # provided key failed — try default and inform the user
+            try:
+                user = UserEmbedding(profile_url, STEAM_API_KEY)
+                user.build_user_vector()
+                recs = user.recommend_games(n_games)
+                if not recs:
+                    raise Exception("Exception")
+                notice = dbc.Alert("Provided Steam Web API key appears invalid; succesfully used default key instead.", color="warning")
+            except Exception as e_default:
+                return dbc.Alert("Could not generate recommendations (provided key invalid and default key failed).", color="danger")
+    else:
+        # no provided key or same as default — use default
+        try:
+            user = UserEmbedding(profile_url, STEAM_API_KEY)
+            user.build_user_vector()
+            recs = user.recommend_games(n_games)
+        except Exception as e:
+            return dbc.Alert(str(e), color="danger")
 
-    except Exception as e:
-        return dbc.Alert(str(e), color="danger")
+    if not recs:
+        return dbc.Alert("No recommendations could be generated.", color="warning")
 
     cards = []
     for idx, (name, score, appid) in enumerate(recs):
